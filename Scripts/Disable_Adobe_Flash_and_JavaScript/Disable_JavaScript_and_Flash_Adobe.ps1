@@ -1,5 +1,5 @@
-﻿Set-Location -Path $PSScriptRoot
-$previousLocation = Get-Location
+﻿$previousLocation = Get-Location
+Set-Location -Path $PSScriptRoot
 
 $appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
@@ -115,4 +115,5 @@ if (Test-Path $RegistryPath) {
     # Add a key and set it to the current date
     Set-ItemProperty -Path $RegistryPath -Name $RegistryLastExecuted -Value $currentDate
 }
+Set-Location -Path $previousLocation
 
