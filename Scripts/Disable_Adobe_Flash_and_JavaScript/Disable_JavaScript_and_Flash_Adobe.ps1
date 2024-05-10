@@ -1,4 +1,5 @@
-﻿$appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
+﻿Set-Location -Path $PSScriptRoot
+$appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
 $logpath = "C:\Logs\$appName"
 $logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__hh-mm")+".txt"
@@ -15,14 +16,14 @@ function AddMissingRegistryKey($registryPath) {
 function CanExecuteScript {
     $lastExecFile = "LastExec.txt"
     if (-not (Test-Path -Path $lastExecFile)) {
-        Write-Output "Debug : Line 18" | Out-File -FilePath $logfile -Append
+        Write-Output "Debug : $($MyInvocation.ScriptLineNumber)" | Out-File -FilePath $logfile -Append
         return $true
     }
     $lastExecTime = Get-Content -Path $lastExecFile
     $timeSinceLastExec = New-TimeSpan -Start $lastExecTime -End (Get-Date)
-    Write-Output "Debug : Line 23 - "+$timeSinceLastExec.TotalHours | Out-File -FilePath $logfile -Append
-    if ($timeSinceLastExec.TotalHours -ge 24) {
-        Write-Output "Debug : Line 25" | Out-File -FilePath $logfile -Append
+    Write-Output "Debug : $($MyInvocation.ScriptLineNumber) - "+$timeSinceLastExec.TotalHours | Out-File -FilePath $logfile -Append
+    if ($timeSinceLastExec.TotalHours -ge 15) {
+        Write-Output "Debug : $($MyInvocation.ScriptLineNumber)" | Out-File -FilePath $logfile -Append
         return $true
     }
     return $false
@@ -31,7 +32,7 @@ function CanExecuteScript {
 
 # Check if the script can execute based on last execution time
 if (-not (CanExecuteScript)) {
-    Write-Output "Debug : Line 34" | Out-File -FilePath $logfile -Append
+    Write-Output "Debug : $($MyInvocation.ScriptLineNumber)" | Out-File -FilePath $logfile -Append
     Write-Output "Script has been executed within the last 24 hours. Exiting." | Out-File -FilePath $logfile -Append
     Exit
 }
