@@ -62,11 +62,11 @@ $RegistryLastExecuted = "LastExecuted"
 # Check if the registry path exists
 if (Test-Path $RegistryPath) {
     # Update the key to the current date
-    Set-ItemProperty -Path $RegistryPath -Name $RegistryLastExecuted -Value $currentDate
+    Set-ItemProperty -Path $RegistryPath -Name $RegistryLastExecuted -Value $currentDate.ToString("dd-MM-yyyy__HH-mm")
 } else {
     # Create the registry path
     New-Item -Path $RegistryPath -Force
 
     # Add a key and set it to the current date
-    Set-ItemProperty -Path $RegistryPath -Name $RegistryLastExecuted -Value $currentDate
+    Set-ItemProperty -Path $RegistryPath -Name $RegistryLastExecuted -Value $currentDate.ToString("dd-MM-yyyy__HH-mm")
 }
