@@ -34,12 +34,12 @@ if (Test-Path -Path $folderPath -PathType Container) {
         # Clone branch
         Set-Location -Path $workingPath
         $result = git clone --branch $branchName $repoUrl 2>&1
-        Write-Output $result | Out-File -FilePath $logfile -Append
+        Write-Output "This is not an error, just git output are of type stderr. $result" | Out-File -FilePath $logfile -Append
     }
     else{
         # Update local branch with a pull
         $result = git -C $pullPath pull 2>&1
-        Write-Output $result | Out-File -FilePath $logfile -Append
+        Write-Output Write-Output "This is not an error, just git output are of type stderr. $result" | Out-File -FilePath $logfile -Append
     }
 } else {
     # Create ISSROAD folder if it doesn't exist
@@ -47,7 +47,7 @@ if (Test-Path -Path $folderPath -PathType Container) {
     # Clone branch
     Set-Location -Path $workingPath
     $result = git clone --branch $branchName $repoUrl 2>&1
-    Write-Output $result | Out-File -FilePath $logfile -Append
+    Write-Output Write-Output "This is not an error, just git output are of type stderr. $result" | Out-File -FilePath $logfile -Append
 }
 Set-Location -Path "$pullPath\scripts"
 Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File 'FolderAccessPermissions.ps1' -PathToSecure $workingPath"
