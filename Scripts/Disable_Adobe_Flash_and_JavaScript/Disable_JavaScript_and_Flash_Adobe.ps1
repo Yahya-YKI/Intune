@@ -1,7 +1,7 @@
 ﻿$appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
 $logpath = "C:\Logs\$appName"
-$logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__hh-mm")
+$logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__hh-mm")+".txt"
 New-Item -ItemType Directory -Path $logpath -Force
 # Function to add missing registry key
 function AddMissingRegistryKey($registryPath) {
@@ -81,7 +81,7 @@ foreach ($path in $registryPaths) {
 
 # Output result
 if ($registryRemediationsDetected) {
-    Write-Output "Registry Remediations Detected, Adobe installed and now will be patched." | Out-File -FilePath $logfile -Append
+    Write-Output "Registry Remediations Detected, Adobe is detected and now will be patched." | Out-File -FilePath $logfile -Append
 } else {
     Write-Output "Registry Remediations not found! No Adobe instance found." | Out-File -FilePath $logfile -Append
     Exit 1
