@@ -1,4 +1,6 @@
 ﻿$appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
+$currentDate = Get-Date
+$logfile = "Logs\log__"+$currentDate.ToString("dd-MM-yyyy__hh-mm")
 # Function to add missing registry key
 function AddMissingRegistryKey($registryPath) {
     $newKeyPath = "$registryPath\FeatureLockDown"
@@ -25,7 +27,7 @@ function CanExecuteScript {
 
 # Check if the script can execute based on last execution time
 if (-not (CanExecuteScript)) {
-    Write-Host "Script has been executed within the last 24 hours. Exiting."
+    Write-Output "Script has been executed within the last 24 hours. Exiting." | Out-File -FilePath $logfile -Append
     Exit
 }
 
@@ -69,7 +71,7 @@ foreach ($path in $registryPaths) {
         if (CheckRegistryValues $path) {
             $registryRemediationsDetected = $true
             if ($newKeyAdded) {
-                Write-Host "Registry key added and correct values set for $($path)\FeatureLockDown"
+                Write-Output "Registry key added and correct values set for $($path)\FeatureLockDown"  | Out-File -FilePath $logfile -Append
             }
         }
     }
@@ -77,14 +79,13 @@ foreach ($path in $registryPaths) {
 
 # Output result
 if ($registryRemediationsDetected) {
-    Write-Host "Registry Remediations Detected"
+    Write-Output "Registry Remediations Detected, Adobe installed and now will be patched." | Out-File -FilePath $logfile -Append
 } else {
-    Write-Host "Registry Remediations not found!"
+    Write-Output "Registry Remediations not found! No Adobe instance found." | Out-File -FilePath $logfile -Append
     Exit 1
 }
 
 # Update last execution time
-$currentDate = Get-Date
 $lastExecFile = Join-Path -Path $PSScriptRoot -ChildPath "LastExec.txt"
 Set-Content -Path $lastExecFile -Value $currentDate
 
