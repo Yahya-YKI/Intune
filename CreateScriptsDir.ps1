@@ -31,6 +31,14 @@ $pullPath = $workingPath+"Intune"
 $repoUrl = "https://github.com/Yahya-YKI/Intune"
 $branchName = "main"
 
+# Delete ISSROAD Folder from previous intune deployment (that wasn't based on github)
+$RegKey = "$appName.ps1"
+$registryPath = "HKLM:\Software\ISSROAD\$RegKey"
+
+if ((Test-Path -Path $workingPath -PathType Container) -and !(Test-Path $registryPath)){
+    Remove-Item -Path $workingPath -Recurse -Force
+}
+
 # 1. Create folder named ISSROAD in C:\ if it doesn't exist and pull from remote git branch
 $folderPath = "C:\ISSROAD"
 if (Test-Path -Path $folderPath -PathType Container) {
