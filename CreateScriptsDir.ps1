@@ -13,6 +13,10 @@
 #                                                                              #
 ################################################################################
 
+# Ensure Git Exists in PATH
+Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+refreshenv
+
 # Logs Vars
 $appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
