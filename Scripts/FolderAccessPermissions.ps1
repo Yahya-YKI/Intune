@@ -1,6 +1,6 @@
 ﻿param (
     [Parameter(Mandatory=$true)]
-    [string]$ScriptPath
+    [string]$PathToSecure
 )
 # Get the name of the local administrators group using its well-known SID
 $AdminGroupName = (New-Object System.Security.Principal.SecurityIdentifier("S-1-5-32-544")).Translate([System.Security.Principal.NTAccount]).Value
@@ -9,7 +9,7 @@ $AdminGroupName = (New-Object System.Security.Principal.SecurityIdentifier("S-1-
 $AdminGroupName = $AdminGroupName -replace "^BUILTIN\\"
 
 # Define the path of the folder
-$folderPath = $ScriptPath
+$folderPath = $PathToSecure
 
 # Get the security descriptor for the folder
 $acl = Get-Acl -Path $folderPath
