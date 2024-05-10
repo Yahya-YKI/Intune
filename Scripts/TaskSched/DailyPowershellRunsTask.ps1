@@ -52,6 +52,9 @@ $arguments = "-ExecutionPolicy Bypass -File `"$scriptPath`""
 # Replace <Arguments> and <URI> in the XML content
 $xmlContent = $xmlContent -replace '<Arguments>.*</Arguments>', "<Arguments>$arguments</Arguments>"
 $xmlContent = $xmlContent -replace '<URI>.*</URI>', "<URI>$scriptPath</URI>"
+$xmlContent = $xmlContent -replace '<Date>.*</Date>', "<Date>$($currentDate.ToString("yyyy-MM-ddTHH:mm:ss"))</Date>"
+$xmlContent = $xmlContent -replace '<StartBoundary>.*</StartBoundary>', "<StartBoundary>$($currentDate.ToString("yyyy-MM-ddTHH:mm:ss"))</StartBoundary>"
+
 
 # Convert the XML content to a string
 $xmlString = $xmlContent | Out-String
