@@ -1,6 +1,6 @@
 ﻿$appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
-$logfile = "Logs\log__"+$currentDate.ToString("dd-MM-yyyy__hh-mm")
+$logfile = "C:\Logs\$appName\log__"+$currentDate.ToString("dd-MM-yyyy__hh-mm")
 # Function to add missing registry key
 function AddMissingRegistryKey($registryPath) {
     $newKeyPath = "$registryPath\FeatureLockDown"
