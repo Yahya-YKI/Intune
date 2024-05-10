@@ -1,0 +1,1 @@
+Write-Output "Run from Task successful !" | Out-File -FilePath C:\task.txt -Append
