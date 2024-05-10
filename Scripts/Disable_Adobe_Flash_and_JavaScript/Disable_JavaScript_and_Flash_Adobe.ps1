@@ -4,7 +4,7 @@ Set-Location -Path $PSScriptRoot
 $appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
 $logpath = "C:\Logs\$appName"
-$logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__hh-mm")+".txt"
+$logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__HH-mm")+".txt"
 New-Item -ItemType Directory -Path $logpath -Force
 # Function to add missing registry key
 function AddMissingRegistryKey($registryPath) {
