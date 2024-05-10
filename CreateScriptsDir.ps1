@@ -52,3 +52,21 @@ if (Test-Path -Path $folderPath -PathType Container) {
 Set-Location -Path "$pullPath\scripts"
 Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File 'FolderAccessPermissions.ps1' -PathToSecure $workingPath"
 Set-Location -Path $previousLocation
+
+
+# Add or update a registry path to ensure detection of execution in intune
+$RegKey = "$appName.ps1"
+$registryPath = "HKLM:\Software\ISSROAD\$RegKey"
+$RegistryLastExecuted = "LastExecuted"
+
+# Check if the registry path exists
+if (Test-Path $RegistryPath) {
+    # Update the key to the current date
+    Set-ItemProperty -Path $RegistryPath -Name $RegistryLastExecuted -Value $currentDate
+} else {
+    # Create the registry path
+    New-Item -Path $RegistryPath -Force
+
+    # Add a key and set it to the current date
+    Set-ItemProperty -Path $RegistryPath -Name $RegistryLastExecuted -Value $currentDate
+}
