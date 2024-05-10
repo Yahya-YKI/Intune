@@ -1,4 +1,6 @@
 ﻿Set-Location -Path $PSScriptRoot
+$previousLocation = Get-Location
+
 $appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
 $logpath = "C:\Logs\$appName"
@@ -16,14 +18,11 @@ function AddMissingRegistryKey($registryPath) {
 function CanExecuteScript {
     $lastExecFile = "LastExec.txt"
     if (-not (Test-Path -Path $lastExecFile)) {
-        Write-Output "Debug : $($MyInvocation.ScriptLineNumber)" | Out-File -FilePath $logfile -Append
         return $true
     }
     $lastExecTime = Get-Content -Path $lastExecFile
     $timeSinceLastExec = New-TimeSpan -Start $lastExecTime -End (Get-Date)
-    Write-Output "Debug : $($MyInvocation.ScriptLineNumber) - "+$timeSinceLastExec.TotalHours | Out-File -FilePath $logfile -Append
     if ($timeSinceLastExec.TotalHours -ge 15) {
-        Write-Output "Debug : $($MyInvocation.ScriptLineNumber)" | Out-File -FilePath $logfile -Append
         return $true
     }
     return $false
@@ -34,6 +33,7 @@ function CanExecuteScript {
 if (-not (CanExecuteScript)) {
     Write-Output "Debug : $($MyInvocation.ScriptLineNumber)" | Out-File -FilePath $logfile -Append
     Write-Output "Script has been executed within the last 24 hours. Exiting." | Out-File -FilePath $logfile -Append
+    Set-Location -Path $previousLocation
     Exit
 }
 
