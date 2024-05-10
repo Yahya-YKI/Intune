@@ -60,7 +60,6 @@ $registryRemediationsDetected = $false
 # Loop through registry paths
 foreach ($path in $registryPaths) {
     if (Test-Path -Path $path) {
-        $registryData = Get-ItemProperty -Path $path
         $newKeyAdded = $false
         
         # Check if the required subkey exists and values match, if not, add or fix it
@@ -81,10 +80,14 @@ foreach ($path in $registryPaths) {
 
 # Output result
 if ($registryRemediationsDetected) {
-    Write-Output "Registry Remediations Detected, Adobe is detected and now will be patched." | Out-File -FilePath $logfile -Append
+    if ($newKeyAdded) {
+        Write-Output "Registry Remediations Detected, Adobe is detected and now has been patched." | Out-File -FilePath $logfile -Append
+    }
+    else {
+        Write-Output "Registry Remediations Detected, Adobe is already patched. No modifications needed." | Out-File -FilePath $logfile -Append
+    }
 } else {
-    Write-Output "Registry Remediations not found! No Adobe instance found." | Out-File -FilePath $logfile -Append
-    Exit 1
+    Write-Output "Registry Remediations not found! No Adobe instance found. Patching not required" | Out-File -FilePath $logfile -Append
 }
 
 # Update last execution time
