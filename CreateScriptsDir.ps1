@@ -6,6 +6,10 @@
 #            exist, clones the GitHub repository 'Yahya-YKI/Intune' as a local #
 #            branch named 'ISSROAD' if no .git folders are found, and restricts#
 #            access to the folder to administrators and the SYSTEM account.    #
+#            It also registers a sched task that runs all configured ps in     #
+#            DailyTasks.ps1 using DailyPowershellRunsTask.ps1.                 #
+#            This script runs automatically from the intune app :              #
+#            "#W#_   Prepare_Git_Env"                                          #
 #                                                                              #
 ################################################################################
 
@@ -50,7 +54,11 @@ if (Test-Path -Path $folderPath -PathType Container) {
     Write-Output Write-Output "This is not an error, just git output are of type stderr. $result" | Out-File -FilePath $logfile -Append
 }
 Set-Location -Path "$pullPath\scripts"
+# Refuse standard users access to C:\ISSROAD\ path
 Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File 'FolderAccessPermissions.ps1' -PathToSecure $workingPath"
+# Register the scheduled tasks for daily runs
+Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File 'DailyPowershellRunsTask.ps1'"
+
 Set-Location -Path $previousLocation
 
 

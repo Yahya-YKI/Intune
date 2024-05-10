@@ -9,8 +9,8 @@
 #            The DailyTasks.ps1 has all the powershell files to run            #
 #            The task is configured using the taskSched.xml template file.     #
 #            If a task with the same name already exists, the script exits.    #
-#            This script runs automatically from the intune app :              #
-#            "#W#_   Prepare_Git_Env"                                          #
+#            This script runs automatically from the script :                  #
+#            "CreateScriptsDir.ps1"                                            #
 #                                                                              #
 ################################################################################
 
