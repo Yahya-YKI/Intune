@@ -57,7 +57,7 @@ Set-Location -Path "$pullPath\scripts"
 # Refuse standard users access to C:\ISSROAD\ path
 Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File 'FolderAccessPermissions.ps1' -PathToSecure $workingPath"
 # Register the scheduled tasks for daily runs
-Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File 'DailyPowershellRunsTask.ps1'"
+Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File 'TaskSched\DailyPowershellRunsTask.ps1'"
 
 Set-Location -Path $previousLocation
 
