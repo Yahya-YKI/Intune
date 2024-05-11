@@ -27,7 +27,7 @@ if (Test-Path -Path $repositoryPath -PathType Container) {
         git -C $repositoryPath reset --hard 2>&1
 
         # Step 3: Pull changes from the remote repository
-        git -C $repositoryPath pull  2>&1
+        $result = git -C $repositoryPath pull  2>&1
         Write-Output "Result of Git Pull : $result" | Out-File -FilePath $logfile -Append
 
         # Step 3: Run Scripts
