@@ -9,7 +9,7 @@ Start-Sleep -Seconds 3
 $duration = ((Get-Date) - $startTime).TotalSeconds
 
 # Generate the content for the text file
-$content = "Script ran successfully in $duration"
+$content = "Script ran successfully in $duration seconds"
 
 # Specify the path to the output file
 $outputFile = "C:\Test_script.txt"
