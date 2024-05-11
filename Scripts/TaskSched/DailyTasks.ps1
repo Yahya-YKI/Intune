@@ -7,55 +7,43 @@ $appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
 $logpath = "C:\Logs\$appName"
 $logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__HH-mm")+".txt"
+$repositoryPath = "C:\ISSROAD\Intune"
 New-Item -ItemType Directory -Path $logpath -Force
 
-# Pull latest changes from remote branch
-$result = git -C "C:\ISSROAD\Intune\" pull 2>&1
-Write-Output "Result of Git Pull : $result" | Out-File -FilePath $logfile -Append
+# Define the path you want to check
+$folderPath = "C:\ISSROAD"
+$gitFolders = Get-ChildItem -Path $folderPath -Force -Recurse -Filter ".git" -Directory
+$rebuildLocaBranch = $false
 
-# A function that sanitizes the input scripts name imported from ScriptsToRun.txt file
-function Sanitize {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$ScriptName
-    )
-    # Check if the string doesn't end with ".ps1", and if so, append it
-    $oldName =$ScriptName
-    if (-not $ScriptName.EndsWith(".ps1")) {
-        $ScriptName += ".ps1"
+# Check if the folder exists and contains a ".git" folder
+if (Test-Path -Path $repositoryPath -PathType Container) {
+    if ($gitFolders.Count -gt 0) {
+        Write-Output "Local Branch Healty! Start pulling process."
+        # Step 1: Discard local changes in the branch
+        git -C $repositoryPath checkout HEAD -- . 2>&1
 
+        # Step 2: Reset the branch to the state of the remote repository
+        git -C $repositoryPath fetch origin 2>&1
+        git -C $repositoryPath reset --hard 2>&1
+
+        # Step 3: Pull changes from the remote repository
+        git -C $repositoryPath pull  2>&1
+        Write-Output "Result of Git Pull : $result" | Out-File -FilePath $logfile -Append
+
+        # Step 3: Run Scripts
+        Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File '$repositoryPath\Scripts\TaskSched\Helper.ps1' -logfile $logfile"
+    }else {
+        $rebuildLocaBranch = $true
     }
-    # Remove "\" or "/" characters from the string
-    $ScriptName = $ScriptName -replace '[\\/\:]', ''
-
-    if (-not ($oldName -eq $ScriptName)) {
-        Write-Output "Warning : ScriptName ""$oldName"" has been sanitized to ""$ScriptName""" | Out-File -FilePath $logfile -Append
-        Write-Output "Please input the filename with extension (ps1) only. no path is needed" | Out-File -FilePath $logfile -Append
-    }
-    
-    return $ScriptName
+}else {
+    $rebuildLocaBranch = $true
+}
+if ($rebuildLocaBranch) {
+    Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/Yahya-YKI/Intune/main/CreateScriptsDir.ps1' -OutFile 'C:\Windows\Temp\CreateScriptsDir.ps1'
+    Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File 'C:\Windows\Temp\CreateScriptsDir.ps1'"
+    Remove-Item -Path "C:\Windows\Temp\CreateScriptsDir.ps1" -Force
+    Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File '$repositoryPath\Scripts\TaskSched\Helper.ps1' -logfile $logfile"
 }
 
-$previousLocation = Get-Location
-$workingPath = "C:\ISSROAD\Intune"
 
-Set-Location $workingPath
-$scriptsToExecutePath = "Scripts\TaskSched\ScriptsToRun.txt"  
-
-$scriptsToExecute = Get-Content -Path $scriptsToExecutePath | Where-Object { $_ -notmatch '^\s*(#|$)' }
-foreach ($script in $scriptsToExecute) {
-    $matchingFile = Get-ChildItem -Path . -Recurse -Filter (Sanitize -ScriptName $script)
-    if ($matchingFile) {
-        # Get the full path of the file
-        $fullPath = $matchingFile.FullName
-        Write-Output "Full path of '$script': $fullPath" | Out-File -FilePath $logfile -Append
-        Write-Output "Executing the script '$script'" | Out-File -FilePath $logfile -Append
-        Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File $fullPath -PathToSecure $workingPath"
-        Write-Output "'$script' has been executed, check its log to see its execution status." | Out-File -FilePath $logfile -Append
-    } else {
-        Write-Output "No file named '$script' found within the current directory and its subdirectories." | Out-File -FilePath $logfile -Append
-    }
-}
-
-Set-Location $previousLocation
 
