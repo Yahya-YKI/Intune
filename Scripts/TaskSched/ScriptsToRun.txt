@@ -1,0 +1,6 @@
+# This text file lists all scripts to run by the scheduled task "DailyPowershellRunsTask".
+# scripts name should be powershell only and have the extension included "ps1"
+# One script per line
+# All empty lines or beginning with "#" are ignored
+
+Disable_JavaScript_and_Flash_Adobe.ps1

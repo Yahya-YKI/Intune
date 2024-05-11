@@ -15,10 +15,11 @@ Write-Output "Result of Git Pull : $result" | Out-File -FilePath $logfile -Appen
 
 $previousLocation = Get-Location
 $workingPath = "C:\ISSROAD\Intune"
-$scriptsToExecute = @("Disable_JavaScript_and_Flash_Adobe.ps1")
 
 Set-Location $workingPath
+$scriptsToExecutePath = "Scripts\TaskSched\ScriptsToRun.txt"  
 
+$scriptsToExecute = Get-Content -Path $scriptsToExecutePath | Where-Object { $_ -notmatch '^\s*(#|$)' }
 foreach ($script in $scriptsToExecute) {
     $matchingFile = Get-ChildItem -Path . -Recurse -Filter $script
     if ($matchingFile) {
