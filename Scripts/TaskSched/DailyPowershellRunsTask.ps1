@@ -16,6 +16,7 @@
 
 $previousLocation = Get-Location
 $workingPath = $PSScriptRoot
+Set-Location $workingPath
 
 # Global Vars
 $GlobalVarsPath = "..\..\GlobalVars.txt"

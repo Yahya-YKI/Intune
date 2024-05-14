@@ -73,7 +73,7 @@ if (Test-Path -Path $folderPath -PathType Container) {
     # Clone branch
     Set-Location -Path $workingPath
     $result = git clone --branch $branchName $repoUrl 2>&1
-    Write-Output Write-Output "This is not an error, just git output are of type stderr. $result" | Out-File -FilePath $logfile -Append
+    Write-Output "This is not an error, just git output are of type stderr. $result" | Out-File -FilePath $logfile -Append
 }
 Set-Location -Path "$pullPath\scripts"
 # Refuse standard users access to C:\ISSROAD\ path
