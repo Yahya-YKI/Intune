@@ -4,6 +4,17 @@ param (
     [string]$logfile
 )
 
+# Global Vars
+$GlobalVarsPath = "..\..\GlobalVars.txt"
+$GlobalVars = @{}
+Get-Content $GlobalVarsPath | ForEach-Object {
+    $variable, $value = ($_ -replace ' = ', '=') -split '='
+    $GlobalVars[$variable] = $value
+}
+
+
+$folderPath = $GlobalVars['WorkingDir']
+
 # A function that sanitizes the input scripts name imported from ScriptsToRun.txt file
 function Sanitize {
     param (
@@ -28,7 +39,7 @@ function Sanitize {
 }
 
 $previousLocation = Get-Location
-$workingPath = "C:\ISSROAD\Intune"
+$workingPath = $folderPath+"Intune"
 
 Set-Location $workingPath
 $scriptsToExecutePath = "Scripts\TaskSched\ScriptsToRun.txt"  
