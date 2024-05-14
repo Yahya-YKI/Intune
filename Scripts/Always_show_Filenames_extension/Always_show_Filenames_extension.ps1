@@ -2,29 +2,9 @@
 # Function to add missing registry key
 function AddMissingRegistryKey($registryPath) {
     New-Item -Path $registryPath -Force | Out-Null
-    Set-ItemProperty -Path $newKeyPath -Name "HideFileExt" -Value 0}
-
-# Function to check if the script can execute based on last execution time
-function CanExecuteScript {
-    $lastExecFile = "LastExec.txt"
-    if (-not (Test-Path -Path $lastExecFile)) {
-        
-        return $true
-    }
-    $lastExecTime = Get-Content -Path $lastExecFile
-    $timeSinceLastExec = New-TimeSpan -Start $lastExecTime -End (Get-Date)
-    if ($timeSinceLastExec.TotalHours -ge 24) {
-        return $true
-    }
-    return $false
+    Set-ItemProperty -Path $newKeyPath -Name "HideFileExt" -Value 0
 }
 
-
-# Check if the script can execute based on last execution time
-if (-not (CanExecuteScript)) {
-    Write-Host "Script has been executed within the last 24 hours. Exiting."
-    Exit
-}
 
 
 # Function to check if registry values match desired values
@@ -51,7 +31,7 @@ Set-Content -Path $lastExecFile -Value $currentDate
 
 # Add or update a registry path to ensure detection of execution in intune
 $RegKey = "$appName.ps1"
-$registryPath = "HKLM:\Software\ISSROAD\$RegKey"
+$registryPath = $GlobalVars['RegPath']+"$RegKey"
 $RegistryLastExecuted = "LastExecuted"
 
 # Check if the registry path exists

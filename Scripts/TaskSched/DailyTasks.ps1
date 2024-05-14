@@ -2,16 +2,25 @@
 Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
 refreshenv
 
+# Global Vars
+$GlobalVarsPath = "..\..\GlobalVars.txt"
+$GlobalVars = @{}
+Get-Content $GlobalVarsPath | ForEach-Object {
+    $variable, $value = ($_ -replace ' = ', '=') -split '='
+    $GlobalVars[$variable] = $value
+}
+
+
 # Logs Vars
 $appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
-$logpath = "C:\Logs\$appName"
+$logpath = $GlobalVars['logPath']+"$appName"
 $logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__HH-mm")+".txt"
-$repositoryPath = "C:\ISSROAD\Intune"
+$folderPath = $GlobalVars['WorkingDir']
+$repositoryPath = $folderPath+"Intune"
 New-Item -ItemType Directory -Path $logpath -Force
 
 # Define the path you want to check
-$folderPath = "C:\ISSROAD"
 $gitFolders = Get-ChildItem -Path $folderPath -Force -Recurse -Filter ".git" -Directory
 $rebuildLocaBranch = $false
 

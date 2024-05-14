@@ -17,30 +17,40 @@
 Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
 refreshenv
 
+$previousLocation = Get-Location
+Set-Location -Path $PSScriptRoot
+
+# Global Vars
+$GlobalVarsPath = "GlobalVars.txt"
+$GlobalVars = @{}
+Get-Content $GlobalVarsPath | ForEach-Object {
+    $variable, $value = ($_ -replace ' = ', '=') -split '='
+    $GlobalVars[$variable] = $value
+}
+
 # Logs Vars
 $appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
-$logpath = "C:\Logs\$appName"
+$logpath = $GlobalVars['logPath']+"$appName"
 $logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__HH-mm")+".txt"
+$folderPath = $GlobalVars['WorkingDir']
 New-Item -ItemType Directory -Path $logpath -Force
 
 # Script Vars
-$previousLocation = Get-Location
-$workingPath = "C:\ISSROAD\"
+$workingPath = $folderPath
 $pullPath = $workingPath+"Intune"
-$repoUrl = "https://github.com/Yahya-YKI/Intune"
-$branchName = "main"
+$repoUrl = $GlobalVars['repoUrl']
+$branchName = $GlobalVars['branchName']
 
 # Delete ISSROAD Folder from previous intune deployment (that wasn't based on github)
 $RegKey = "$appName.ps1"
-$registryPath = "HKLM:\Software\ISSROAD\$RegKey"
+$registryPath = $GlobalVars['RegPath']+"$RegKey"
 
 if ((Test-Path -Path $workingPath -PathType Container) -and !(Test-Path $registryPath)){
     Remove-Item -Path $workingPath -Recurse -Force
 }
 
 # 1. Create folder named ISSROAD in C:\ if it doesn't exist and pull from remote git branch
-$folderPath = "C:\ISSROAD"
 if (Test-Path -Path $folderPath -PathType Container) {
     $gitFolders = Get-ChildItem -Path $folderPath -Force -Recurse -Filter ".git" -Directory
     if ($gitFolders.Count -eq 0) {
@@ -76,7 +86,7 @@ Set-Location -Path $previousLocation
 
 # Add or update a registry path to ensure detection of execution in intune
 $RegKey = "$appName.ps1"
-$registryPath = "HKLM:\Software\ISSROAD\$RegKey"
+$registryPath = $GlobalVars['RegPath']+"$RegKey"
 $RegistryLastExecuted = "LastExecuted"
 
 # Check if the registry path exists

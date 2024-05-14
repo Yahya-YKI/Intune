@@ -1,11 +1,21 @@
 ﻿$previousLocation = Get-Location
 Set-Location -Path $PSScriptRoot
 
+# Global Vars
+$GlobalVarsPath = "..\..\GlobalVars.txt"
+$GlobalVars = @{}
+Get-Content $GlobalVarsPath | ForEach-Object {
+    $variable, $value = ($_ -replace ' = ', '=') -split '='
+    $GlobalVars[$variable] = $value
+}
+
+# Logs Vars
 $appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
-$logpath = "C:\Logs\$appName"
+$logpath = $GlobalVars['logPath']+"$appName"
 $logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__HH-mm")+".txt"
 New-Item -ItemType Directory -Path $logpath -Force
+
 # Function to add missing registry key
 function AddMissingRegistryKey($registryPath) {
     $newKeyPath = "$registryPath\FeatureLockDown"
@@ -100,7 +110,7 @@ Set-Content -Path $lastExecFile -Value $currentDate
 
 # Add or update a registry path to ensure detection of execution in intune
 $RegKey = "$appName.ps1"
-$registryPath = "HKLM:\Software\ISSROAD\$RegKey"
+$registryPath = $GlobalVars['RegPath']+"$RegKey"
 $RegistryLastExecuted = "LastExecuted"
 
 # Check if the registry path exists

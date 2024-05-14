@@ -1,0 +1,5 @@
+WorkingDir = C:\ISSROAD\
+logPath = C:\Logs\
+RegPath = HKLM:\Software\ISSROAD\
+branchName = main
+repoUrl = https://github.com/Yahya-YKI/Intune

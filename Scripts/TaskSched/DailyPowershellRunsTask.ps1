@@ -14,17 +14,24 @@
 #                                                                              #
 ################################################################################
 
+# Global Vars
+$GlobalVarsPath = "..\..\GlobalVars.txt"
+$GlobalVars = @{}
+Get-Content $GlobalVarsPath | ForEach-Object {
+    $variable, $value = ($_ -replace ' = ', '=') -split '='
+    $GlobalVars[$variable] = $value
+}
 
 # Logs Vars
 $appName = $MyInvocation.MyCommand.Name -replace '\.ps1$'
 $currentDate = Get-Date
-$logpath = "C:\Logs\$appName"
+$logpath = $GlobalVars['logPath']+"$appName"
 $logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__HH-mm")+".txt"
 New-Item -ItemType Directory -Path $logpath -Force
 
 # Script Vars
 $previousLocation = Get-Location
-$workingPath = "C:\ISSROAD\Intune\Scripts\TaskSched"
+$workingPath = Set-Location -Path $PSScriptRoot
 
 Set-Location $workingPath # "C:\ISSROAD\Intune\Scripts\TaskSched"
 
