@@ -14,6 +14,9 @@
 #                                                                              #
 ################################################################################
 
+$previousLocation = Get-Location
+$workingPath = $PSScriptRoot
+
 # Global Vars
 $GlobalVarsPath = "..\..\GlobalVars.txt"
 $GlobalVars = @{}
@@ -29,11 +32,6 @@ $logpath = $GlobalVars['logPath']+"$appName"
 $logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__HH-mm")+".txt"
 New-Item -ItemType Directory -Path $logpath -Force
 
-# Script Vars
-$previousLocation = Get-Location
-$workingPath = Set-Location -Path $PSScriptRoot
-
-Set-Location $workingPath # "C:\ISSROAD\Intune\Scripts\TaskSched"
 
 # Check if the task already exists
 $existingTask = Get-ScheduledTask -TaskName $appName -ErrorAction SilentlyContinue
@@ -68,3 +66,4 @@ $xmlString = $xmlContent | Out-String
 
 # Register the task in Task Scheduler
 Register-ScheduledTask -Xml $xmlString -TaskName $appName -Force
+Set-Location $previousLocation

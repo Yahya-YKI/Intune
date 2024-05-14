@@ -2,6 +2,9 @@
 Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
 refreshenv
 
+$previousLocation = Get-Location
+Set-Location -Path $PSScriptRoot
+
 # Global Vars
 $GlobalVarsPath = "..\..\GlobalVars.txt"
 $GlobalVars = @{}
@@ -53,6 +56,6 @@ if ($rebuildLocaBranch) {
     Remove-Item -Path "C:\Windows\Temp\CreateScriptsDir.ps1" -Force
     Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File '$repositoryPath\Scripts\TaskSched\Helper.ps1' -logfile $logfile"
 }
-
+Set-Location -Path $previousLocation
 
 
