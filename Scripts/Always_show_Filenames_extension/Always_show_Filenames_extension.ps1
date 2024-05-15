@@ -18,31 +18,56 @@ New-Item -ItemType Directory -Path $logpath -Force
 
 
 # Function to check if registry values match desired values
-function CheckRegistryValues($registryPath) {
-    $subkeyValues = Get-ItemProperty -Path "$registryPath"
+function CheckRegistryValues($RegToCheck) {
+     
+    $subkeyValues = Get-ItemProperty -Path "$RegToCheck"
     if ($subkeyValues.HideFileExt -eq 0) {
         Write-Output "HideFileExt=0, no further actions needed." | Out-File -FilePath $logfile -Append
         return $true
     }
     return $false
 }
+# \Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders
+
+function GetAllSIDs {
+
+    $tmp_ListAllSIDs = Get-ChildItem "Registry::HKEY_USERS" | Where-Object { $_.PSIsContainer } | Select-Object -ExpandProperty Name
+    $ListAllSIDs = @()
+    for ($i = 0; $i -lt $tmp_ListAllSIDs.Count; $i++) {
+        $tmp_ListAllSIDs[$i]=$tmp_ListAllSIDs[$i].split('\')[1]
+        if(($tmp_ListAllSIDs[$i].Length -gt 30) -and ($tmp_ListAllSIDs[$i] -match '^S-\d{1,}-\d{1,}-\d{1,}-\d{1,}-\d{1,}-\d{1,}-\d{1,}$')){
+            $ListAllSIDs+=$tmp_ListAllSIDs[$i]
+        }
+    }
+
+    return $ListAllSIDs    
+}
 
 # Edit Registry and Restart Explorer to show extensions
-if (-not (CheckRegistryValues)) {
-    Write-Output "HideFileExt!=0 or not exists, Setting it to 0." | Out-File -FilePath $logfile -Append
-    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0
-    if (CheckRegistryValues) {
-        Write-Output "Registry key has been set to 0." | Out-File -FilePath $logfile -Append
-    }else {
-        Write-Output "Registry modification failed. Trying later" | Out-File -FilePath $logfile -Append
+$AllSIDs = GetAllSIDs
+$RestartExplorer = $false
+foreach ($SID in $AllSIDs) {
+    <# $SID is the current item #>
+    $RegToEdit = "registry::HKEY_USERS\$SID\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+    if (Test-Path $RegToEdit) {
+        if (-not (CheckRegistryValues -RegToCheck $RegToEdit)) {
+            Write-Output "HideFileExt!=0 or not exists, Setting it to 0." | Out-File -FilePath $logfile -Append
+            Set-ItemProperty -Path $RegToEdit -Name "HideFileExt" -Value 0
+            if (CheckRegistryValues -RegToCheck $RegToEdit) {
+                Write-Output "Registry key has been set to 0." | Out-File -FilePath $logfile -Append
+                $RestartExplorer=$true
+            }else {
+                Write-Output "Registry modification failed. Trying later" | Out-File -FilePath $logfile -Append
+            }
+    
+        }
     }
+}
+if($RestartExplorer){
     Stop-Process -Name explorer -Force
     Start-Process explorer
 }
 
-# Update last execution time
-$lastExecFile = Join-Path -Path $PSScriptRoot -ChildPath "LastExec.txt"
-Set-Content -Path $lastExecFile -Value $currentDate
 
 
 # Add or update a registry path to ensure detection of execution in intune
