@@ -69,7 +69,7 @@ foreach ($user in $UsersToDenyLogon)
     {
         $scriptResult = .\Set-UserRights.ps1 -AddRight -Username $user.Caption -UserRight SeDenyInteractiveLogonRight
         Write-Output "$scriptResult" | Out-File -FilePath $logfile -Append
-        Write-Output "The user "+$user.Caption+" has been added to `"SeDenyInteractiveLogonRight`" policy." | Out-File -FilePath $logfile -Append
+        Write-Output "The user "($user.Caption)" has been added to `"SeDenyInteractiveLogonRight`" policy." | Out-File -FilePath $logfile -Append
     }
 
 }
