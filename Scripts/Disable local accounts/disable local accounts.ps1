@@ -36,6 +36,7 @@ Function GetAdminSID{
     $executablePath = Join-Path -Path $PSScriptRoot -ChildPath "PsGetsid64.exe"
     $DomainSID = (Invoke-Expression "& '$executablePath' /accepteula" 2> $null)
     $AdminSID = $DomainSID[7]+"-500"
+    Write-Output "1- $AdminSID" | Out-File -FilePath $logfile -Append ########
     return $AdminSID
 }
 
@@ -43,6 +44,7 @@ Function GetUsersToDisable{
     $UsersToDisable=@()
     $AdminSID = GetAdminSID
     $UsersSID=Get-WmiObject -Class Win32_UserAccount
+    Write-Output "2- $UsersSID" | Out-File -FilePath $logfile -Append ########
     $AuthenticatedUsers = (Get-ChildItem c:\users).Name
 
     foreach ($user in $AuthenticatedUsers)
@@ -57,15 +59,11 @@ Function GetUsersToDisable{
 }
 
 #Disable Users
-$UsersToDisable = GetUsersToDisable
-if ($UsersToDisable.count -gt 0){
-foreach ($user in $UsersToDisable)
+$UsersToDenyLogon = GetUsersToDisable
+if ($UsersToDenyLogon.count -gt 0){
+foreach ($user in $UsersToDenyLogon)
 {
-    Disable-LocalUser -SID $User
-    $UserName = SIDtoUsername -SID $user
-    if(-not (Get-LocalUser -Name $UserName).Enabled){
-        Write-Output "The local user $UserName has been disabled" | Out-File -FilePath $logfile -Append
-    }
+    New-LocalUserRight -AccountName $user -Right "SeDenyInteractiveLogonRight"
 }
 }
 Set-Location -Path $previousLocation
