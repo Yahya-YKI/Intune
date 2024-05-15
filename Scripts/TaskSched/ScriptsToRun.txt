@@ -2,6 +2,7 @@
 # scripts name should be powershell only and have the extension included "ps1"
 # One script per line
 # All empty lines or beginning with "#" are ignored
+# Folders should be spaceless!!! If the Dir contains a space, its script won't run
 
 Disable_JavaScript_and_Flash_Adobe.ps1
 Always_show_Filenames_extension.ps1
