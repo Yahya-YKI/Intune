@@ -52,7 +52,7 @@ foreach ($script in $scriptsToExecute) {
         $fullPath = $matchingFile.FullName
         Write-Output "Full path of '$script': $fullPath" | Out-File -FilePath $logfile -Append
         Write-Output "Executing the script '$script'" | Out-File -FilePath $logfile -Append
-        Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File $fullPath -PathToSecure $workingPath"
+        Invoke-Expression "powershell.exe -ExecutionPolicy Bypass -File $fullPath" | Out-Null
         Write-Output "'$script' has been executed, check its log to see its execution status." | Out-File -FilePath $logfile -Append
     } else {
         Write-Output "No file named '$script' found within the current directory and its subdirectories." | Out-File -FilePath $logfile -Append
