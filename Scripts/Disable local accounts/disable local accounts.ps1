@@ -59,11 +59,15 @@ Function GetUsersToDisable{
 }
 
 #Disable Users
-$UsersToDenyLogon = GetUsersToDisable
-if ($UsersToDenyLogon.count -gt 0){
+$UsersToDenyLogon = (Get-WmiObject -Class Win32_UserAccount).SID
+$AdminSID = GetAdminSID
 foreach ($user in $UsersToDenyLogon)
 {
-    New-LocalUserRight -AccountName $user -Right "SeDenyInteractiveLogonRight"
+    if($user -ne $AdminSID)
+    {
+        New-LocalUserRight -AccountName $user -Right "SeDenyInteractiveLogonRight"
+    }
+
 }
-}
+
 Set-Location -Path $previousLocation
