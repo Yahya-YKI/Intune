@@ -16,6 +16,22 @@ $logpath = $GlobalVars['logPath']+"$appName"
 $logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__HH-mm")+".txt"
 New-Item -ItemType Directory -Path $logpath -Force
 
+# Function to convert user SID to username
+function SIDtoUsername($SID) {
+
+    # Convert SID to NTAccount
+    try {
+        $userAccount = New-Object System.Security.Principal.SecurityIdentifier($SID)
+        $userName = $userAccount.Translate([System.Security.Principal.NTAccount]).Value
+        return $userName
+    } catch {
+        Write-Host "Failed to convert SID to username. Error: $_"
+        return ""
+    }
+
+    
+}
+
 
 # Function to check if registry values match desired values
 function CheckRegistryValues($RegToCheck) {
@@ -51,6 +67,8 @@ foreach ($SID in $AllSIDs) {
     $RegToEdit = "registry::HKEY_USERS\$SID\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
     if (Test-Path $RegToEdit) {
         if (-not (CheckRegistryValues -RegToCheck $RegToEdit)) {
+            $UserName = SIDtoUsername -SID $SID
+            Write-Output "------  Username : $UserName" | Out-File -FilePath $logfile -Append
             Write-Output "HideFileExt!=0 or not exists, Setting it to 0." | Out-File -FilePath $logfile -Append
             Set-ItemProperty -Path $RegToEdit -Name "HideFileExt" -Value 0
             if (CheckRegistryValues -RegToCheck $RegToEdit) {
@@ -66,6 +84,7 @@ foreach ($SID in $AllSIDs) {
 if($RestartExplorer){
     Stop-Process -Name explorer -Force
     Start-Process explorer
+    Write-Output "Explorer has been restarted wmic  " | Out-File -FilePath $logfile -Append
 }
 
 
