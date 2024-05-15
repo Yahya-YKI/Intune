@@ -69,11 +69,12 @@ foreach ($SID in $AllSIDs) {
         $UserName = SIDtoUsername -SID $SID
         Write-Output "------  Username : $UserName" | Out-File -FilePath $logfile -Append
         if (-not (CheckRegistryValues -RegToCheck $RegToEdit)) {
-            Write-Output "HideFileExt!=0 or not exists, Setting it to 0." | Out-File -FilePath $logfile -Append
+            Write-Output "HideFileExt=1 or not exists, Setting it to 0." | Out-File -FilePath $logfile -Append
             Set-ItemProperty -Path $RegToEdit -Name "HideFileExt" -Value 0
             if (CheckRegistryValues -RegToCheck $RegToEdit) {
                 Write-Output "Registry key has been set to 0." | Out-File -FilePath $logfile -Append
                 $RestartExplorer=$true
+                Write-Output "`$RestartExplorer=true." | Out-File -FilePath $logfile -Append
             }else {
                 Write-Output "Registry modification failed. Trying later" | Out-File -FilePath $logfile -Append
             }
@@ -84,7 +85,7 @@ foreach ($SID in $AllSIDs) {
 if($RestartExplorer){
     Stop-Process -Name explorer -Force
     Start-Process explorer
-    Write-Output "Explorer has been restarted wmic  " | Out-File -FilePath $logfile -Append
+    Write-Output "Explorer has been restarted." | Out-File -FilePath $logfile -Append
 }
 
 
