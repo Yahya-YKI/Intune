@@ -59,13 +59,13 @@ Function GetUsersToDisable{
 }
 
 #Disable Users
-$UsersToDenyLogon = (Get-WmiObject -Class Win32_UserAccount).SID
+$UsersToDenyLogon = Get-WmiObject -Class Win32_UserAccount
 $AdminSID = GetAdminSID
 foreach ($user in $UsersToDenyLogon)
 {
-    if($user -ne $AdminSID)
+    if($user.SID -ne $AdminSID)
     {
-        New-LocalUserRight -AccountName $user -Right "SeDenyInteractiveLogonRight"
+        .\Set-UserRights.ps1 -AddRight -Username $user.Caption -UserRight SeDenyInteractiveLogonRight
     }
 
 }
