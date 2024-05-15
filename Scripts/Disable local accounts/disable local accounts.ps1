@@ -24,7 +24,7 @@ function SIDtoUsername($SID) {
         $userName = $userAccount.Translate([System.Security.Principal.NTAccount]).Value
         return $userName
     } catch {
-        Write-Host "Failed to convert SID to username. Error: $_"
+        Write-Output "Failed to convert SID to username. Error: $_"  | Out-File -FilePath $logfile -Append
         return ""
     }
 
@@ -36,6 +36,10 @@ Function GetAdminSID{
     $executablePath = Join-Path -Path $PSScriptRoot -ChildPath "PsGetsid64.exe"
     $DomainSID = (Invoke-Expression "& '$executablePath' /accepteula" 2> $null)
     $AdminSID = $DomainSID[7]+"-500"
+    if ((SIDtoUsername -SID $AdminSID) -eq "" ) {
+        Write-Output "Couldn't Detect Admin account, Aborting..."  | Out-File -FilePath $logfile -Append
+        Exit -1
+    }
     return $AdminSID
 }
 
