@@ -66,9 +66,9 @@ foreach ($SID in $AllSIDs) {
     <# $SID is the current item #>
     $RegToEdit = "registry::HKEY_USERS\$SID\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
     if (Test-Path $RegToEdit) {
+        $UserName = SIDtoUsername -SID $SID
+        Write-Output "------  Username : $UserName" | Out-File -FilePath $logfile -Append
         if (-not (CheckRegistryValues -RegToCheck $RegToEdit)) {
-            $UserName = SIDtoUsername -SID $SID
-            Write-Output "------  Username : $UserName" | Out-File -FilePath $logfile -Append
             Write-Output "HideFileExt!=0 or not exists, Setting it to 0." | Out-File -FilePath $logfile -Append
             Set-ItemProperty -Path $RegToEdit -Name "HideFileExt" -Value 0
             if (CheckRegistryValues -RegToCheck $RegToEdit) {
