@@ -36,7 +36,6 @@ Function GetAdminSID{
     $executablePath = Join-Path -Path $PSScriptRoot -ChildPath "PsGetsid64.exe"
     $DomainSID = (Invoke-Expression "& '$executablePath' /accepteula" 2> $null)
     $AdminSID = $DomainSID[7]+"-500"
-    Write-Output "1- $AdminSID" | Out-File -FilePath $logfile -Append ########
     return $AdminSID
 }
 
@@ -44,7 +43,6 @@ Function GetUsersToDisable{
     $UsersToDisable=@()
     $AdminSID = GetAdminSID
     $UsersSID=Get-WmiObject -Class Win32_UserAccount
-    Write-Output "2- $UsersSID" | Out-File -FilePath $logfile -Append ########
     $AuthenticatedUsers = (Get-ChildItem c:\users).Name
 
     foreach ($user in $AuthenticatedUsers)
@@ -65,7 +63,9 @@ foreach ($user in $UsersToDenyLogon)
 {
     if($user.SID -ne $AdminSID)
     {
-        .\Set-UserRights.ps1 -AddRight -Username $user.Caption -UserRight SeDenyInteractiveLogonRight
+        $scriptResult = .\Set-UserRights.ps1 -AddRight -Username $user.Caption -UserRight SeDenyInteractiveLogonRight
+        Write-Output "$scriptResult" | Out-File -FilePath $logfile -Append
+        Write-Output "The user "+$user.Caption+" has been added to `"SeDenyInteractiveLogonRight`" policy." | Out-File -FilePath $logfile -Append
     }
 
 }
