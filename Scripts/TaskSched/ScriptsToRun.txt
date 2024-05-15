@@ -4,4 +4,4 @@
 # All empty lines or beginning with "#" are ignored
 
 Disable_JavaScript_and_Flash_Adobe.ps1
-Always_show_Filenames_extension.ps1
+#Always_show_Filenames_extension.ps1
