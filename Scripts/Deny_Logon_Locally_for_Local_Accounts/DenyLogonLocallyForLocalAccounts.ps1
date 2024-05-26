@@ -1,5 +1,6 @@
 ﻿$previousLocation = Get-Location
 Set-Location -Path $PSScriptRoot
+$ExcludedDevices = @("L-5CD2045NRP")
 
 # Global Vars
 $GlobalVarsPath = "..\..\GlobalVars.txt"
@@ -15,6 +16,11 @@ $currentDate = Get-Date
 $logpath = $GlobalVars['logPath']+"$appName"
 $logfile = "$logpath\log__"+$currentDate.ToString("dd-MM-yyyy__HH-mm")+".txt"
 New-Item -ItemType Directory -Path $logpath -Force
+
+# Some devices need to have some local accounts.
+if ($env:COMPUTERNAME -in $ExcludedDevices) {
+    Exit 0
+}
 
 function SIDtoUsername($SID) {
 
